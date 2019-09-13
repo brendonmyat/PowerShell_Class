@@ -1,0 +1,50 @@
+###PowerShell cmdlet to list services that are stopped###
+Get-Service | Where-Object {$_.Status -eq "Stopped"}
+
+###PowerShell cmdlet to save services that are stopped to a file###
+Get-Service * | Where {$_.Status -eq "Stopped"} | out-file ".\services.txt"
+
+###PowerShell cmdlet to list Windows services###
+Get-Service * | Sort-Object -property ServiceType | Format-Table Name, ServiceType, Status, CanStop, -auto
+
+
+###To check whether a service is installed###
+Clear-Host
+$sName = "TeamViewer 12"
+$service = Get-Service -display $sName -ErrorAction SilentlyContinue 
+If ( -not $service ) 
+{$sName + " is not installed on this computer. `n
+Did you really mean: " + $sName } 
+else { $sName + " is installed." 
+$sName + "'s status is: " + $service.Status }
+
+
+###PowerShell cmdlet to start a named service###
+Clear-Host
+$srvName = "PLA"
+$servicePrior = Get-Service $srvName
+"$srvName is now " + $servicePrior.status
+Set-Service $srvName -startuptype manual
+Start-Service $srvName
+$serviceAfter = Get-Service $srvName
+"$srvName is now " + $serviceAfter.status
+
+
+###PowerShell cmdlet to stop the Perf log and alert service###
+$srvName = "PLA"
+$servicePrior = Get-Service $srvName
+"$srvName is now " + $servicePrior.status
+Stop-Service $srvName
+$serviceAfter = Get-Service $srvName
+Set-Service $srvName -startuptype disabled
+"$srvName is now " + $serviceAfter.status
+
+
+###PowerShell cmdlet to Restart the Spooler service###
+$srvName = "Spooler"
+$servicePrior = Get-Service $srvName
+"$srvName is now " + $servicePrior.status
+Set-Service $srvName -startuptype manual
+Restart-Service $srvName
+$serviceAfter = Get-Service $srvName
+"$srvName is now " + $serviceAfter.status
